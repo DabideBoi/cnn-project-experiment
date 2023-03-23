@@ -1,0 +1,28 @@
+#!/bin/bash
+
+FILE_TO_WATCH="results.csv"  # Change this to the filename you want to watch
+# REFRESH_CMD="python script_to_refresh.py"  # Change this to the command to refresh your script
+clear
+
+while true; do
+  inotifywait -q -e modify "$FILE_TO_WATCH"
+  # clear
+  # echo "File $FILE_TO_WATCH has been modified. Refreshing..."
+  # $REFRESH_CMD
+
+  # Calculate percentage of CSV file processed
+  num_lines=$(wc -l < "$FILE_TO_WATCH")
+  percentage=$((num_lines * 100 / 125))
+
+  # Draw progress bar
+  # cols=$(tput cols)
+  # bar_size=$((cols - 10))
+  bar_size=20
+  filled_size=$((bar_size * percentage / 100))
+  empty_size=$((bar_size - filled_size))
+  filled=$(printf "%0.s=" $(seq 1 $filled_size))
+  empty=$(printf "%0.s-" $(seq 1 $empty_size))
+  clear
+  cat $FILE_TO_WATCH
+  echo -ne "Processed: [$filled$empty] $percentage%\r"
+done
